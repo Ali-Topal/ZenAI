@@ -14,7 +14,7 @@ COPY package*.json ./
 # Install dependencies
 # Using npm ci instead of npm install for more reliable builds
 # npm ci is specifically designed for automated environments like Docker
-RUN npm ci
+RUN npm install
 
 # Copy the rest of the application code
 # This includes all files from the current directory
