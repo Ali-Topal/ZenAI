@@ -23,7 +23,7 @@ COPY . .
 # Expose port 3000
 # This documents which port the application is listening on
 # Note: This is only documentation and doesn't actually publish the port
-EXPOSE 3000
+EXPOSE 8080
 
 # Set NODE_ENV to production
 # This optimizes Node.js for production use
