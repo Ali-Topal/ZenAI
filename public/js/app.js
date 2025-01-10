@@ -35,6 +35,11 @@ Type 'help' for available commands
       return;
     }
 
+    if (message.toLowerCase() === 'clear') {
+      this.clearTerminal();
+      return;
+    }
+
     try {
       const response = await fetch('/api/messages', {
         method: 'POST',
@@ -42,14 +47,22 @@ Type 'help' for available commands
         body: JSON.stringify({ role: 'user', content: message })
       });
 
-      if (!response.ok) throw new Error('API request failed');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'API request failed');
+      }
 
       const data = await response.json();
       this.appendToTerminal(data.content, 'bot');
     } catch (error) {
       console.error('Error:', error);
-      this.appendToTerminal('Error: Unable to process your request.', 'error');
+      this.appendToTerminal(`Error: ${error.message || 'Unable to process your request.'}`, 'error');
     }
+  }
+
+  clearTerminal() {
+    this.outputDiv.innerHTML = '';
+    this.displayWelcomeMessage();
   }
 
   displayHelp() {

@@ -1,11 +1,13 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 import dotenv from 'dotenv';
-import fetch from 'node-fetch';
+import OpenAI from 'openai';
 
 dotenv.config();
 
-console.log("API function started");
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 // Database configuration
 const pool = new Pool({
@@ -44,45 +46,41 @@ export default async function handler(req, res) {
   }
 
   try {
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: "gpt-4",
-        messages: [SYSTEM_MESSAGE, { role, content }],
-        max_tokens: 200,
-        temperature: 0.7
-      })
+    // OpenAI API request
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [SYSTEM_MESSAGE, { role, content }],
+      max_tokens: 200,
+      temperature: 0.7
     });
 
-    if (!openaiResponse.ok) {
-      throw new Error('OpenAI API request failed');
+    const aiResponse = completion.choices[0].message.content;
+
+    // Database operations in separate try-catch
+    try {
+      // Store the conversation in the database
+      await pool.query(
+        'INSERT INTO messages (role, content) VALUES ($1, $2)',
+        [role, content]
+      );
+
+      // Store AI's response
+      await pool.query(
+        'INSERT INTO messages (role, content) VALUES ($1, $2)',
+        ['assistant', aiResponse]
+      );
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      // Continue with the response even if database operations fail
     }
-
-    const data = await openaiResponse.json();
-    const aiResponse = data.choices[0].message.content;
-
-    // Store the conversation in the database
-    await pool.query(
-      'INSERT INTO messages (role, content) VALUES ($1, $2)',
-      [role, content]
-    );
-
-    // Store AI's response
-    await pool.query(
-      'INSERT INTO messages (role, content) VALUES ($1, $2)',
-      ['assistant', aiResponse]
-    );
 
     return res.status(200).json({ content: aiResponse });
   } catch (error) {
     console.error('Error processing request:', error);
+    const errorMessage = error.response?.data?.error?.message || error.message;
     return res.status(500).json({
       status: 'error',
-      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error'
     });
   }
 } 
