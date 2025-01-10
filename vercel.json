@@ -1,13 +1,12 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "api/messages.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      { "src": "/api/messages", "dest": "api/messages.js" }
-    ]
-  }
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/messages", "destination": "/api/messages.js" }
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "public",
+  "public": true,
+  "cleanUrls": true,
+  "trailingSlash": false
+}
   

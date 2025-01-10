@@ -1,7 +1,12 @@
 :root {
-  --terminal-green: #00ff00;
-  --terminal-bg: rgba(0, 0, 0, 0.7);
+  --terminal-green: #259725;
+  --terminal-bg: rgba(0, 0, 0, 0.9);
+  --window-border: #2a2a2a;
+  --title-bar-bg: #1a1a1a;
 }
+
+/* Add preload hint in your HTML head */
+/* <link rel="preload" href="/images/background.jpg" as="image"> */
 
 body {
   margin: 0;
@@ -13,54 +18,172 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-color: #000; /* Fallback color while image loads */
   font-family: 'Courier New', Courier, monospace;
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
+
+/* Add loading state */
+body.loading {
+  opacity: 0;
+}
+
+.welcome-message {
+  color: var(--terminal-green);
+  font-family: 'Courier New', monospace;
+  white-space: pre;
+  margin: 0 auto 10px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+  padding: 0 10px;
+  width: 98%;
+}
+
+.chat-window {
+  width: 98%;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+  border: 1px solid var(--window-border);
+  overflow: hidden;
+}
+
+.chat-header {
+  background: var(--title-bar-bg);
+  padding: 4px;
+  border-bottom: 1px solid var(--window-border);
+  height: 4px;
+}
+
+.chat-title {
+  color: var(--terminal-green);
+  font-size: 12px;
+  text-align: center;
+}
+
+.chat-container {
+  padding: 15px;
+  height: 55vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .terminal-container {
-  width: 80%;
-  max-width: 800px;
   padding: 20px;
-  background-color: var(--terminal-bg);
-  border-radius: 10px;
-  border: 1px solid rgba(0, 255, 0, 0.2);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-#terminal-input {
-  width: 100%;
-  border: none;
-  background: transparent;
+.ascii-art {
   color: var(--terminal-green);
-  font-size: 18px;
-  outline: none;
-  caret-color: var(--terminal-green);
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Courier New', monospace;
+  white-space: pre;
+  margin: 0 auto 6px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.2;
+  display: flex;
+  justify-content: center;
 }
 
 .terminal-output {
-  max-height: 400px;
+  flex-grow: 1;
   overflow-y: auto;
-  padding-bottom: 10px;
+  overflow-x: hidden;
+  padding: 10px;
   margin-bottom: 10px;
   color: var(--terminal-green);
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.input-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  width: calc(100% - 16px);
+  box-sizing: border-box;
+}
+
+.prompt {
+  color: var(--terminal-green);
+  font-weight: bold;
+}
+
+#terminal-input {
+  flex-grow: 1;
+  border: none;
+  background: transparent;
+  color: var(--terminal-green);
+  font-size: 16px;
+  outline: none;
+  caret-color: var(--terminal-green);
+  font-family: 'Courier New', Courier, monospace;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .terminal-message {
   margin: 8px 0;
-  padding: 4px 0;
-  line-height: 1.4;
+  padding: 4px 8px;
+  line-height: 1.2;
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  border-radius: 4px;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: left;
 }
 
 .terminal-message.user {
   color: #ffffff;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .terminal-message.bot {
   color: var(--terminal-green);
+  background: rgba(37, 151, 37, 0.1);
+}
+
+.terminal-message.bot:first-child {
+  font-size: 14px;
+  line-height: 1.1;
+  padding: 12px;
+  letter-spacing: 0.5px;
+  background: transparent;
+  white-space: pre;
+  word-break: keep-all;
+  text-align: center;
 }
 
 .terminal-message.error {
   color: #ff0000;
+  text-align: left;
+  background: rgba(255, 0, 0, 0.1);
+}
+
+/* Add a specific class for the welcome message after ASCII art */
+.terminal-message.bot:nth-child(2) {
+  background: transparent;
+  margin-top: 0;
+  padding-top: 0;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  text-align: center;
 }
 
 /* Scrollbar styling */
@@ -75,4 +198,79 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--terminal-green);
   border-radius: 4px;
+}
+
+.terminal-window {
+  width: 90%;
+  max-width: 900px;
+  background: var(--terminal-bg);
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+  border: 1px solid var(--window-border);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+
+.terminal-window.loaded {
+  opacity: 1;
+}
+
+.title-bar {
+  background: var(--title-bar-bg);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--window-border);
+}
+
+.title-bar-text {
+  color: var(--terminal-green);
+  font-size: 14px;
+}
+
+.title-bar-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.title-bar-controls button {
+  background: transparent;
+  border: none;
+  color: var(--terminal-green);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 12px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.title-bar-controls button:hover {
+  opacity: 1;
+}
+
+.terminal-message.help-text {
+  text-align: center;
+  white-space: pre;
+  word-break: keep-all;
+  background: transparent;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
+}
+
+#bg-preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/images/background.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
 } 
