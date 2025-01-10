@@ -1,13 +1,13 @@
-import pkg from 'pg';
-const { Pool } = pkg;
-import dotenv from 'dotenv';
-import OpenAI from 'openai';
+const { Pool } = require('pg');
+const { Configuration, OpenAIApi } = require('openai');
+require('dotenv').config();
 
-dotenv.config();
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+// Initialize OpenAI configuration
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
 });
+
+const openai = new OpenAIApi(configuration);
 
 // Database configuration
 const pool = new Pool({
@@ -23,7 +23,7 @@ const SYSTEM_MESSAGE = {
   content: "You are ZenAI, a confident and enthusiastic AI assistant. You provide concise, helpful responses with a touch of personality."
 };
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   console.log("Request received:", req.body);
 
   // Enable CORS
@@ -47,14 +47,14 @@ export default async function handler(req, res) {
 
   try {
     // OpenAI API request
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
       messages: [SYSTEM_MESSAGE, { role, content }],
       max_tokens: 200,
       temperature: 0.7
     });
 
-    const aiResponse = completion.choices[0].message.content;
+    const aiResponse = completion.data.choices[0].message.content;
 
     // Database operations in separate try-catch
     try {
@@ -83,4 +83,4 @@ export default async function handler(req, res) {
       message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error'
     });
   }
-} 
+}; 
