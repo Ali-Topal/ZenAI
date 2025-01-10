@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/api/messages", "destination": "/api/messages.js" }
+  ],
+  "functions": {
+    "api/messages.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+} 

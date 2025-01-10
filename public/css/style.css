@@ -1,0 +1,78 @@
+:root {
+  --terminal-green: #00ff00;
+  --terminal-bg: rgba(0, 0, 0, 0.7);
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('/images/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.terminal-container {
+  width: 80%;
+  max-width: 800px;
+  padding: 20px;
+  background-color: var(--terminal-bg);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+#terminal-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--terminal-green);
+  font-size: 18px;
+  outline: none;
+  caret-color: var(--terminal-green);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.terminal-output {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  color: var(--terminal-green);
+}
+
+.terminal-message {
+  margin: 8px 0;
+  padding: 4px 0;
+  line-height: 1.4;
+}
+
+.terminal-message.user {
+  color: #ffffff;
+}
+
+.terminal-message.bot {
+  color: var(--terminal-green);
+}
+
+.terminal-message.error {
+  color: #ff0000;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--terminal-green);
+  border-radius: 4px;
+} 
