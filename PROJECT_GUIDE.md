@@ -13,18 +13,18 @@ This project uses the following tools:
 
 ### **Vercel (Deployment and Logs)**
 
-vercel --prod           # Deploy the site to production
-vercel dev              # Run the website locally for testing
-vercel logs --prod      # View runtime logs for debugging
+**vercel --prod**: Deploy the site to production
+**vercel dev**: Run the website locally for testing
+**vercel logs --prod**: View runtime logs for debugging
 
 ### **Git Commands**
 
-git init                # Initialize a Git repository
-git remote add origin <repository-URL> # Add the GitHub repository URL
-git add .               # Stage changes
-git commit -m "message"  # Commit the staged changes
-git push origin main    # Push changes to GitHub
-git pull origin main    # Pull the latest changes from GitHub
+**git init**: Initialize a Git repository
+**git remote add origin <repository-URL>**: Add the GitHub repository URL
+**git add .**: Stage changes
+**git commit -m "message"**: Commit the staged changes
+**git push origin main**: Push changes to GitHub
+**git pull origin main**: Pull the latest changes from GitHub
 
 ### **Environment Variables**
 
