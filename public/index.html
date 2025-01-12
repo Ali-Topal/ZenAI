@@ -3,57 +3,211 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZenAI Interactive Bot</title>
+  <title>SmartStash - AI-Powered Savings Vault</title>
   
-  <!-- Preload background image -->
+  <!-- Preload assets -->
   <link rel="preload" href="/images/background.jpg" as="image" type="image/jpeg" fetchpriority="high">
+  <link rel="preload" href="/fonts/Inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/Poppins.woff2" as="font" type="font/woff2" crossorigin>
   
-  <!-- Preload fonts -->
-  <link rel="preload" href="/fonts/CourierNew.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
   
   <!-- Stylesheets -->
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <!-- Add a background preloader div -->
-  <div id="bg-preloader"></div>
-  
-  <div class="terminal-window">
-    <div class="title-bar">
-      <div class="title-bar-text">ZenAI Terminal</div>
-      <div class="title-bar-controls">
-        <button class="minimize" aria-label="Minimize">
-          <i class="fas fa-window-minimize"></i>
-        </button>
-        <button class="maximize" aria-label="Maximize">
-          <i class="fas fa-window-maximize"></i>
-        </button>
-        <button class="close" aria-label="Close">
-          <i class="fas fa-times"></i>
-        </button>
+  <!-- Modern UI -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>SmartStash</h1>
+        <h2>AI-Powered Savings Vault</h2>
+        <p>Maximize your crypto savings with intelligent staking strategies and AI-driven insights.</p>
+        <div class="cta-buttons">
+          <button id="get-started" class="btn primary">Get Started</button>
+          <button id="learn-more" class="btn secondary">Learn More</button>
+        </div>
       </div>
-    </div>
-    <div class="terminal-container">
-      <div class="ascii-art" id="ascii-title">
-        <!-- ASCII art will be inserted by JavaScript -->
+      <div class="scroll-indicator">
+        <span class="scroll-text">Scroll to explore</span>
+        <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="welcome-message" id="welcome-message">
-        <!-- Welcome message will be inserted by JavaScript -->
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+      <h2>How It Works</h2>
+      <div class="steps-container">
+        <div class="step">
+          <i class="fas fa-wallet"></i>
+          <h3>Connect Wallet</h3>
+          <p>Link your Solana wallet securely to start your savings journey.</p>
+        </div>
+        <div class="step">
+          <i class="fas fa-coins"></i>
+          <h3>Stake Tokens</h3>
+          <p>Stake your tokens to earn rewards and unlock bonus features.</p>
+        </div>
+        <div class="step">
+          <i class="fas fa-robot"></i>
+          <h3>Get AI Insights</h3>
+          <p>Receive personalized recommendations to optimize your returns.</p>
+        </div>
       </div>
-      
-      <div class="chat-window">
-        <div class="chat-header"></div>
-        <div class="chat-container">
-          <div class="terminal-output" id="output"></div>
-          <div class="input-line">
-            <span class="prompt">$</span>
-            <input type="text" id="terminal-input" placeholder="Type your question..." autofocus>
+    </section>
+
+    <!-- Rewards Section -->
+    <section class="rewards">
+      <h2>Milestone Rewards</h2>
+      <div class="rewards-table">
+        <div class="reward-tier">
+          <div class="tier-header">
+            <i class="fas fa-seedling"></i>
+            <h3>Starter</h3>
           </div>
+          <div class="bonus">5%</div>
+          <ul class="benefits">
+            <li>Base APY rewards</li>
+            <li>Basic AI insights</li>
+            <li>Community access</li>
+          </ul>
+        </div>
+        <div class="reward-tier">
+          <div class="tier-header">
+            <i class="fas fa-tree"></i>
+            <h3>Growth</h3>
+          </div>
+          <div class="bonus">10%</div>
+          <ul class="benefits">
+            <li>Enhanced APY rewards</li>
+            <li>Advanced AI insights</li>
+            <li>Priority support</li>
+            <li>Exclusive events</li>
+          </ul>
+        </div>
+        <div class="reward-tier">
+          <div class="tier-header">
+            <i class="fas fa-gem"></i>
+            <h3>Elite</h3>
+          </div>
+          <div class="bonus">15%</div>
+          <ul class="benefits">
+            <li>Maximum APY rewards</li>
+            <li>Premium AI insights</li>
+            <li>24/7 VIP support</li>
+            <li>Early access features</li>
+            <li>Custom strategies</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wallet Integration -->
+    <section class="wallet-connect">
+      <h2>Connect Your Wallet</h2>
+      <div class="wallet-options">
+        <button class="wallet-btn phantom">
+          <img src="images/phantom.png" alt="Phantom">
+          Phantom
+        </button>
+        <button class="wallet-btn solflare">
+          <img src="images/solflare.png" alt="Solflare">
+          Solflare
+        </button>
+      </div>
+    </section>
+
+    <!-- AI Insights -->
+    <section class="ai-insights">
+      <h2>AI-Powered Insights</h2>
+      <div class="insights-container">
+        <div class="insight-example">
+          <i class="fas fa-chart-line"></i>
+          <div>
+            <h3>Market Analysis</h3>
+            <p>Get real-time market analysis and staking recommendations.</p>
+          </div>
+        </div>
+        <div class="insight-example">
+          <i class="fas fa-bullseye"></i>
+          <div>
+            <h3>Goal Tracking</h3>
+            <p>Track your progress and receive personalized milestone alerts.</p>
+          </div>
+        </div>
+        <div class="insight-example">
+          <i class="fas fa-shield-alt"></i>
+          <div>
+            <h3>Risk Management</h3>
+            <p>Smart alerts help you manage risk and optimize returns.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Terminal Overlay -->
+  <div class="terminal-overlay">
+    <div class="terminal-window">
+      <div class="title-bar">
+        <div class="title-bar-text">SmartStash Terminal</div>
+        <div class="title-bar-controls">
+          <button class="close">×</button>
+        </div>
+      </div>
+      <div class="terminal-container">
+        <pre id="ascii-title"></pre>
+        <pre id="welcome-message"></pre>
+        <div id="output" class="terminal-output"></div>
+        <div class="input-line">
+          <span class="prompt">$</span>
+          <input type="text" id="terminal-input" autofocus spellcheck="false" autocomplete="off" placeholder="Type a command...">
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>SmartStash</h3>
+        <p>AI-Powered Savings Vault</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-discord"></i></a>
+          <a href="#"><i class="fab fa-telegram"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h3>Resources</h3>
+        <a href="#">Documentation</a>
+        <a href="#">Whitepaper</a>
+        <a href="#">Blog</a>
+      </div>
+      <div class="footer-section">
+        <h3>Support</h3>
+        <a href="#">Help Center</a>
+        <a href="#">Community</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-section">
+        <h3>Legal</h3>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Disclaimer</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 SmartStash. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
   <script src="/js/app.js"></script>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 </body>
 </html> 
