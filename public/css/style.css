@@ -50,6 +50,14 @@
   height: 70vh;
   overflow-y: auto;
   font-family: 'Courier New', monospace;
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-output {
+  flex-grow: 1;
+  padding-bottom: 20px;
+  overflow-y: auto;
 }
 
 .terminal-message {
@@ -103,6 +111,11 @@
   align-items: center;
   margin-top: 10px;
   font-family: 'Courier New', monospace;
+  position: sticky;
+  bottom: 0;
+  background: var(--terminal-bg);
+  padding: 10px 0;
+  width: 100%;
 }
 
 .prompt {
@@ -134,20 +147,20 @@
 }
 
 /* Terminal scrollbar */
-.terminal-container::-webkit-scrollbar {
+.terminal-output::-webkit-scrollbar {
   width: 8px;
 }
 
-.terminal-container::-webkit-scrollbar-track {
+.terminal-output::-webkit-scrollbar-track {
   background: rgba(76, 175, 80, 0.1);
 }
 
-.terminal-container::-webkit-scrollbar-thumb {
+.terminal-output::-webkit-scrollbar-thumb {
   background: rgba(76, 175, 80, 0.3);
   border-radius: 4px;
 }
 
-.terminal-container::-webkit-scrollbar-thumb:hover {
+.terminal-output::-webkit-scrollbar-thumb:hover {
   background: rgba(76, 175, 80, 0.5);
 }
 
@@ -246,6 +259,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   gap: 1rem;
   justify-content: center;
+  margin-bottom: 2rem;
 }
 
 /* Buttons */
@@ -325,13 +339,15 @@ h1, h2, h3, h4, h5, h6 {
 .rewards {
   padding: 5rem 2rem;
   background: var(--background);
+  text-align: center;
 }
 
 .rewards-table {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
-  margin-top: 3rem;
+  margin: 3rem auto;
+  max-width: 1200px;
 }
 
 .reward-tier {
@@ -455,6 +471,7 @@ h1, h2, h3, h4, h5, h6 {
 .ai-insights {
   padding: 5rem 2rem;
   background: var(--background);
+  text-align: center;
 }
 
 .insights-container {
@@ -468,8 +485,10 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 12px;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  justify-content: center;
+  text-align: left;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   border: 1px solid rgba(46, 125, 50, 0.2);
 }
@@ -553,6 +572,7 @@ footer {
     flex-direction: column;
     width: 100%;
     max-width: 300px;
+    margin-bottom: 2rem;
   }
   
   .steps-container {
@@ -567,7 +587,7 @@ footer {
 /* Scroll Indicator */
 .scroll-indicator {
   position: absolute;
-  bottom: 2rem;
+  bottom: 1.5rem;
   left: 50%;
   transform: translate(-50%, 0);
   display: flex;
@@ -582,12 +602,12 @@ footer {
 }
 
 .scroll-indicator i {
-  font-size: 2rem;
+  font-size: 1.5rem;
   margin-top: 0.5rem;
 }
 
 .scroll-text {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.5rem;

@@ -271,7 +271,19 @@ Next Reward: 12 hours`;
     messageElement.className = `terminal-message ${type}`;
     messageElement.textContent = message;
     this.outputDiv.appendChild(messageElement);
-    this.outputDiv.scrollTop = this.outputDiv.scrollHeight;
+    
+    // Calculate if we should scroll based on visibility
+    const rect = messageElement.getBoundingClientRect();
+    const containerRect = this.outputDiv.getBoundingClientRect();
+    const shouldScroll = rect.bottom > containerRect.bottom;
+
+    if (shouldScroll) {
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Ensure input is visible
+      setTimeout(() => {
+        this.outputDiv.scrollTop = this.outputDiv.scrollHeight;
+      }, 100);
+    }
   }
 }
 
