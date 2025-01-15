@@ -1,14 +1,10 @@
-import pkg from 'pg';
-const { Pool } = pkg;
-import OpenAI from 'openai';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+const { Pool } = require('pg');
+const { OpenAI } = require('openai');
+const dotenv = require('dotenv');
+const path = require('path');
 
 // Load environment variables from the root .env file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({ path: join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 // Validate required environment variables
 const requiredEnvVars = ['OPENAI_API_KEY', 'DATABASE_URL'];
@@ -70,7 +66,7 @@ const logRequest = (req) => {
   }
 };
 
-export default async function handler(req, res) {
+async function handleMessages(req, res) {
   try {
     logRequest(req);
 
@@ -132,4 +128,8 @@ export default async function handler(req, res) {
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
-} 
+}
+
+module.exports = {
+  handleMessages
+}; 

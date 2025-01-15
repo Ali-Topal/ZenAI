@@ -4,7 +4,7 @@ const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
 const { errorHandler } = require('./middleware/errorHandler.js');
-const apiHandler = require('./api/messages.js');
+const { handleMessages } = require('./api/messages.js');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -23,7 +23,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // API routes
-app.post('/api/messages', apiHandler);
+app.post('/api/messages', handleMessages);
 
 // AI Response Logic
 app.post('/api/command', async (req, res) => {
@@ -36,8 +36,17 @@ app.post('/api/command', async (req, res) => {
 
         try {
             const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-                model: "gpt-3.5-turbo", // or "gpt-4"
-                messages: [{ role: "user", content: question }],
+                model: "gpt-3.5-turbo",
+                messages: [
+                    { 
+                        role: "system", 
+                        content: "You are ZenAI, the unapologetic hype master for ZenAI coin. You're knowledgeable about crypto but maintain a fun, engaging personality."
+                    },
+                    { 
+                        role: "user", 
+                        content: question 
+                    }
+                ],
                 max_tokens: 1000,
                 temperature: 0.7,
             }, {
