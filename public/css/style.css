@@ -217,31 +217,33 @@ h1, h2, h3, h4, h5, h6 {
 /* Hero Section */
 .hero {
   min-height: 45vh;
-  background: linear-gradient(
-    135deg,
-    var(--background) 0%,
-    var(--primary) 35%,
-    var(--primary-light) 65%,
-    var(--background) 100%
-  );
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 18, 25, 1) 0%,
+    rgba(26, 38, 52, 0.95) 50%,
+    rgba(10, 18, 25, 1) 100%
+  );
   position: relative;
   overflow: hidden;
-  text-align: center;
 }
 
+/* Add a subtle overlay gradient */
 .hero::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('/images/grid.svg') repeat;
-  opacity: 0.1;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at center,
+    rgba(76, 175, 80, 0.1) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -731,3 +733,121 @@ footer {
     max-width: 350px;
   }
 } 
+
+/* Menu Button and Navigation */
+.menu-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(10, 18, 25, 0.8);
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+}
+
+.menu-btn__burger {
+  width: 20px;
+  height: 2px;
+  background: var(--accent-green);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.menu-btn__burger::before,
+.menu-btn__burger::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 2px;
+  background: var(--accent-green);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.menu-btn__burger::before {
+  transform: translateY(-6px);
+}
+
+.menu-btn__burger::after {
+  transform: translateY(6px);
+}
+
+/* Animation Classes */
+.menu-btn.open .menu-btn__burger {
+  background: transparent;
+}
+
+.menu-btn.open .menu-btn__burger::before {
+  transform: rotate(45deg);
+}
+
+.menu-btn.open .menu-btn__burger::after {
+  transform: rotate(-45deg);
+}
+
+.nav-menu {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 300px;
+  height: 100vh;
+  background: rgba(10, 18, 25, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  transition: left 0.3s ease;
+  border-right: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.nav-menu.open {
+  left: 0;
+}
+
+.nav-menu ul {
+  list-style: none;
+  padding: 80px 0 0 0;
+}
+
+.nav-menu ul li {
+  padding: 0 20px;
+}
+
+.nav-menu ul li a {
+  display: block;
+  padding: 15px 0;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+  transition: all 0.3s ease;
+}
+
+.nav-menu ul li a:hover {
+  color: var(--accent-green);
+  padding-left: 10px;
+}
+
+.milestone-rewards {
+  padding: 5rem 2rem;
+  background: var(--background);
+  text-align: center;
+}
+
+.milestone-rewards h2 {
+  margin-bottom: 3rem;
+  text-align: center;
+  color: var(--text);
+}
+
+.rewards-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin: 0 auto;
+  max-width: 1200px;
+}

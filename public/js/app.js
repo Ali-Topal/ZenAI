@@ -2,33 +2,45 @@ class SmartStash {
   constructor() {
     this.initializeUI();
     this.initializeScroll();
+    this.initializeMenu();
   }
 
   initializeUI() {
-    // Button handlers
-    document.getElementById('get-started').addEventListener('click', () => {
-      document.querySelector('.terminal-overlay').style.display = 'block';
-      document.getElementById('terminal-input').focus();
-    });
+    const getStartedBtn = document.getElementById('get-started');
+    const learnMoreBtn = document.getElementById('learn-more');
+    const terminalOverlay = document.querySelector('.terminal-overlay');
+    const closeBtn = document.querySelector('.terminal-window .close');
 
-    document.querySelector('.close').addEventListener('click', () => {
-      document.querySelector('.terminal-overlay').style.display = 'none';
-    });
+    if (getStartedBtn) {
+      getStartedBtn.addEventListener('click', () => {
+        if (terminalOverlay) {
+          terminalOverlay.style.display = 'flex';
+          this.terminal.focusInput();
+        }
+      });
+    }
 
-    document.getElementById('learn-more').addEventListener('click', () => {
-      document.getElementById('how-it-works').scrollIntoView({ behavior: 'smooth' });
-    });
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        if (terminalOverlay) {
+          terminalOverlay.style.display = 'none';
+        }
+      });
+    }
 
-    // Initialize wallet buttons
-    const walletButtons = document.querySelectorAll('.wallet-btn');
-    walletButtons.forEach(button => {
-      button.addEventListener('click', () => this.connectWallet(button.classList[1]));
-    });
+    // Close terminal when clicking outside
+    if (terminalOverlay) {
+      terminalOverlay.addEventListener('click', (e) => {
+        if (e.target === terminalOverlay) {
+          terminalOverlay.style.display = 'none';
+        }
+      });
+    }
 
     // Close terminal with Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        document.querySelector('.terminal-overlay').style.display = 'none';
+      if (e.key === 'Escape' && terminalOverlay) {
+        terminalOverlay.style.display = 'none';
       }
     });
   }
@@ -52,6 +64,69 @@ class SmartStash {
           scrollIndicator.style.opacity = '0.8';
           scrollIndicator.style.pointerEvents = 'all';
         }
+      });
+    }
+  }
+
+  initializeMenu() {
+    const menuBtn = document.querySelector('.menu-btn');
+    const navMenu = document.querySelector('.nav-menu');
+    let menuOpen = false;
+
+    if (menuBtn && navMenu) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent event from bubbling up
+        if (!menuOpen) {
+          menuBtn.classList.add('open');
+          navMenu.classList.add('open');
+          menuOpen = true;
+        } else {
+          menuBtn.classList.remove('open');
+          navMenu.classList.remove('open');
+          menuOpen = false;
+        }
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (menuOpen && !menuBtn.contains(e.target) && !navMenu.contains(e.target)) {
+          menuBtn.classList.remove('open');
+          navMenu.classList.remove('open');
+          menuOpen = false;
+        }
+      });
+
+      // Handle navigation links
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('href');
+          
+          if (targetId === '#') {
+            window.scrollTo({ 
+              top: 0, 
+              behavior: 'smooth' 
+            });
+          } else {
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+              const offset = 20;
+              const elementPosition = targetElement.getBoundingClientRect().top;
+              const offsetPosition = elementPosition + window.pageYOffset - offset;
+              
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+              });
+            }
+          }
+          
+          // Close menu after clicking
+          menuBtn.classList.remove('open');
+          navMenu.classList.remove('open');
+          menuOpen = false;
+        });
       });
     }
   }

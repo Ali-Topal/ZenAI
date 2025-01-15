@@ -1,50 +1,67 @@
-import express from 'express';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import dotenv from 'dotenv';
-import { errorHandler } from './middleware/errorHandler.js';
-import apiHandler from './api/messages.js';
-
-// Load environment variables
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+const path = require('path');
+const { errorHandler } = require('./middleware/errorHandler.js');
+const apiHandler = require('./api/messages.js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 // Middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.static(join(__dirname, 'public')));
+app.use(express.static('public'));
 
-// CORS middleware
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  next();
+// Rate limiting
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
 });
+app.use('/api/', limiter);
 
 // API routes
 app.post('/api/messages', apiHandler);
 
+// AI Response Logic
+app.post('/api/command', async (req, res) => {
+    const { command, question } = req.body;
+
+    if (command === 'ask') {
+        if (!question) {
+            return res.status(400).json({ status: 'error', message: 'No question provided' });
+        }
+
+        try {
+            const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+                model: "gpt-3.5-turbo", // or "gpt-4"
+                messages: [{ role: "user", content: question }],
+                max_tokens: 1000,
+                temperature: 0.7,
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const aiResponse = response.data.choices[0].message.content;
+            return res.json({ status: 'success', output: aiResponse });
+        } catch (error) {
+            console.error('Error communicating with AI API:', error.message);
+            return res.status(500).json({ status: 'error', message: 'Failed to get response from AI' });
+        }
+    }
+
+    res.status(400).json({ status: 'error', message: 'Invalid command' });
+});
+
 // Error handling
 app.use(errorHandler);
 
-// Start server with port fallback
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}).on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is in use. Trying port ${PORT + 1}`);
-    app.listen(PORT + 1, () => {
-      console.log(`Server running on port ${PORT + 1}`);
-    });
-  } else {
-    console.error('Server error:', err);
-  }
-}); 
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
