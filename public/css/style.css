@@ -739,8 +739,8 @@ footer {
   position: fixed;
   top: 20px;
   left: 20px;
-  width: 40px;
-  height: 40px;
+  width: 65px;
+  height: 65px;
   cursor: pointer;
   z-index: 1001;
   display: flex;
@@ -752,10 +752,10 @@ footer {
 }
 
 .menu-btn__burger {
-  width: 20px;
-  height: 2px;
+  width: 32px;
+  height: 3px;
   background: var(--accent-green);
-  border-radius: 2px;
+  border-radius: 3px;
   transition: all 0.3s ease;
 }
 
@@ -763,19 +763,19 @@ footer {
 .menu-btn__burger::after {
   content: '';
   position: absolute;
-  width: 20px;
-  height: 2px;
+  width: 32px;
+  height: 3px;
   background: var(--accent-green);
-  border-radius: 2px;
+  border-radius: 3px;
   transition: all 0.3s ease;
 }
 
 .menu-btn__burger::before {
-  transform: translateY(-6px);
+  transform: translateY(-8px);
 }
 
 .menu-btn__burger::after {
-  transform: translateY(6px);
+  transform: translateY(8px);
 }
 
 /* Animation Classes */
@@ -858,8 +858,8 @@ footer {
   top: 20px;
   right: 20px;
   z-index: 1001;
-  width: 40px;
-  height: 40px;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   background: rgba(10, 18, 25, 0.8);
   backdrop-filter: blur(4px);
@@ -877,7 +877,7 @@ footer {
 }
 
 .x-logo {
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
 }
