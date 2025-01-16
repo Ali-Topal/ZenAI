@@ -851,3 +851,33 @@ footer {
   margin: 0 auto;
   max-width: 1200px;
 }
+
+/* X (Twitter) Button */
+.x-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(10, 18, 25, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.x-button:hover {
+  transform: scale(1.1);
+  background: rgba(10, 18, 25, 0.9);
+  border-color: var(--accent-green);
+}
+
+.x-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
