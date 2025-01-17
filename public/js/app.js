@@ -1,369 +1,201 @@
-class SmartStash {
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+
+const noise = `
+// Simplex 2D noise
+vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+
+float snoise(vec2 v){
+  const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+           -0.577350269189626, 0.024390243902439);
+  vec2 i  = floor(v + dot(v, C.yy) );
+  vec2 x0 = v -   i + dot(i, C.xx);
+  vec2 i1;
+  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
+  i = mod(i, 289.0);
+  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+  + i.x + vec3(0.0, i1.x, 1.0 ));
+  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+    dot(x12.zw,x12.zw)), 0.0);
+  m = m*m ;
+  m = m*m ;
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+  vec3 g;
+  g.x  = a0.x  * x0.x  + h.x  * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
+}`;
+
+class Landscape extends THREE.Mesh {
   constructor() {
-    this.initializeUI();
-    this.initializeScroll();
-    this.initializeMenu();
-  }
-
-  initializeUI() {
-    const getStartedBtn = document.getElementById('get-started');
-    const learnMoreBtn = document.getElementById('learn-more');
-    const terminalOverlay = document.querySelector('.terminal-overlay');
-    const closeBtn = document.querySelector('.terminal-window .close');
-
-    if (getStartedBtn) {
-      getStartedBtn.addEventListener('click', () => {
-        if (terminalOverlay) {
-          terminalOverlay.style.display = 'flex';
-          this.terminal.focusInput();
-        }
-      });
-    }
-
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        if (terminalOverlay) {
-          terminalOverlay.style.display = 'none';
-        }
-      });
-    }
-
-    // Close terminal when clicking outside
-    if (terminalOverlay) {
-      terminalOverlay.addEventListener('click', (e) => {
-        if (e.target === terminalOverlay) {
-          terminalOverlay.style.display = 'none';
-        }
-      });
-    }
-
-    // Close terminal with Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && terminalOverlay) {
-        terminalOverlay.style.display = 'none';
-      }
-    });
-  }
-
-  initializeScroll() {
-    const scrollIndicator = document.querySelector('.scroll-indicator');
-    if (scrollIndicator) {
-      scrollIndicator.addEventListener('click', () => {
-        document.getElementById('how-it-works').scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      });
-
-      // Hide scroll indicator when user scrolls down
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
-          scrollIndicator.style.opacity = '0';
-          scrollIndicator.style.pointerEvents = 'none';
-        } else {
-          scrollIndicator.style.opacity = '0.8';
-          scrollIndicator.style.pointerEvents = 'all';
-        }
-      });
-    }
-  }
-
-  initializeMenu() {
-    const menuBtn = document.querySelector('.menu-btn');
-    const navMenu = document.querySelector('.nav-menu');
-    let menuOpen = false;
-
-    if (menuBtn && navMenu) {
-      menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent event from bubbling up
-        if (!menuOpen) {
-          menuBtn.classList.add('open');
-          navMenu.classList.add('open');
-          menuOpen = true;
-        } else {
-          menuBtn.classList.remove('open');
-          navMenu.classList.remove('open');
-          menuOpen = false;
-        }
-      });
-
-      // Close menu when clicking outside
-      document.addEventListener('click', (e) => {
-        if (menuOpen && !menuBtn.contains(e.target) && !navMenu.contains(e.target)) {
-          menuBtn.classList.remove('open');
-          navMenu.classList.remove('open');
-          menuOpen = false;
-        }
-      });
-
-      // Handle navigation links
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetId = link.getAttribute('href');
-          
-          if (targetId === '#') {
-            window.scrollTo({ 
-              top: 0, 
-              behavior: 'smooth' 
-            });
-          } else {
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-              const offset = 20;
-              const elementPosition = targetElement.getBoundingClientRect().top;
-              const offsetPosition = elementPosition + window.pageYOffset - offset;
-              
-              window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-              });
-            }
-          }
-          
-          // Close menu after clicking
-          menuBtn.classList.remove('open');
-          navMenu.classList.remove('open');
-          menuOpen = false;
-        });
-      });
-    }
-  }
-
-  async connectWallet(type) {
-    try {
-      if (type === 'phantom') {
-        if (!window.solana || !window.solana.isPhantom) {
-          alert('Phantom wallet is not installed!');
-          window.open('https://phantom.app/', '_blank');
-          return;
-        }
-        await window.solana.connect();
-      } else if (type === 'solflare') {
-        if (!window.solflare) {
-          alert('Solflare wallet is not installed!');
-          window.open('https://solflare.com/', '_blank');
-          return;
-        }
-        await window.solflare.connect();
-      }
-      this.updateWalletUI(true);
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
-      alert('Failed to connect wallet. Please try again.');
-    }
-  }
-
-  updateWalletUI(connected) {
-    const walletSection = document.querySelector('.wallet-connect');
-    if (connected) {
-      walletSection.innerHTML = `
-        <h2>Wallet Connected</h2>
-        <div class="wallet-info">
-          <i class="fas fa-check-circle"></i>
-          <p>Your wallet is connected and ready to use SmartStash!</p>
-        </div>
-      `;
-    }
-  }
-}
-
-class Terminal {
-  constructor() {
-    this.inputField = document.getElementById('terminal-input');
-    this.outputDiv = document.getElementById('output');
-    this.asciiTitle = document.getElementById('ascii-title');
-    this.welcomeMessage = document.getElementById('welcome-message');
-    this.commandHistory = [];
-    this.historyIndex = -1;
-    this.initializeEventListeners();
-    this.displayAsciiTitle();
-    this.displayWelcomeMessage();
-  }
-
-  initializeEventListeners() {
-    this.inputField.addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') {
-        const userMessage = this.inputField.value.trim();
-        if (!userMessage) return;
-
-        this.appendToTerminal(`> ${userMessage}`, 'user');
-        this.inputField.value = '';
-        this.commandHistory.push(userMessage);
-        this.historyIndex = this.commandHistory.length;
-
-        await this.processCommand(userMessage);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        this.navigateHistory('up');
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        this.navigateHistory('down');
-      }
-    });
-
-    // Prevent terminal overlay from closing when clicking inside
-    document.querySelector('.terminal-window').addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.inputField.focus();
-    });
-
-    // Close terminal when clicking outside
-    document.querySelector('.terminal-overlay').addEventListener('click', () => {
-      document.querySelector('.terminal-overlay').style.display = 'none';
-    });
-  }
-
-  navigateHistory(direction) {
-    if (direction === 'up' && this.historyIndex > 0) {
-      this.historyIndex--;
-      this.inputField.value = this.commandHistory[this.historyIndex];
-    } else if (direction === 'down' && this.historyIndex < this.commandHistory.length - 1) {
-      this.historyIndex++;
-      this.inputField.value = this.commandHistory[this.historyIndex];
-    } else if (direction === 'down' && this.historyIndex === this.commandHistory.length - 1) {
-      this.historyIndex = this.commandHistory.length;
-      this.inputField.value = '';
-    }
-  }
-
-  displayAsciiTitle() {
-    const asciiArt = 
-`
-  ╔═══════════════════════════════════════════════════════════════╗
-  ║    ____                       _   ____  _            _        ║
-  ║   / ___| _ __ ___   __ _ _ __| |_/ ___|| |_ __ _ ___| |__     ║
-  ║   \\___ \\|  _ \` _ \\ / _\` | '__| __\\___ \\| __/ _\` / __| '_ \\    ║
-  ║    ___) | | | | | | (_| | |  | |_ ___) | || (_| \\__ \\ | | |   ║
-  ║   |____/|_| |_| |_|\\__,_|_|   \\__|____/ \\__\\__,_|___/_| |_|   ║
-  ║                                                               ║
-  ║                 AI-Powered Savings Vault v1.0                 ║
-  ╚═══════════════════════════════════════════════════════════════╝
-  `;
-    this.asciiTitle.textContent = asciiArt;
-  }
-
-  displayWelcomeMessage() {
-    const welcomeText = 
-`Welcome to SmartStash Terminal v1.0
-Type 'help' to see available commands
-`;
-    this.welcomeMessage.textContent = welcomeText;
-    this.appendToTerminal('Type a command to begin...', 'info');
-  }
-
-  async processCommand(command) {
-    const cmd = command.toLowerCase().split(' ')[0];
-    const args = command.split(' ').slice(1).join(' ');
-
-    switch(cmd) {
-      case 'help':
-        this.displayHelp();
-        break;
-      case 'clear':
-        this.clearTerminal();
-        break;
-      case 'balance':
-        this.displayBalance();
-        break;
-      case 'stake':
-        await this.handleStake(args);
-        break;
-      case 'rewards':
-        this.displayRewards();
-        break;
-      case 'insights':
-        this.displayInsights();
-        break;
-      default:
-        this.appendToTerminal(`Command not found: ${cmd}. Type 'help' for available commands.`, 'error');
-    }
-  }
-
-  displayHelp() {
-    const helpText = 
-`Available Commands:
-╭───────────────────────────────────────╮
-│ balance  - Check your current balance │
-│ stake    - Stake your tokens          │
-│ rewards  - View earned rewards        │
-│ insights - Get AI-powered insights    │
-│ clear    - Clear the terminal         │
-│ help     - Show this help message     │
-╰───────────────────────────────────────╯`;
-    this.appendToTerminal(helpText, 'success');
-  }
-
-  displayBalance() {
-    // Mock balance data
-    const balanceText = 
-`Current Balance:
-SOL: 10.5
-Staked: 5.0
-Rewards: 0.25`;
-    this.appendToTerminal(balanceText, 'success');
-  }
-
-  async handleStake(amount) {
-    if (!amount) {
-      this.appendToTerminal('Please specify an amount to stake. Usage: stake <amount>', 'error');
-      return;
-    }
-    // Mock staking process
-    this.appendToTerminal('Processing stake...', 'info');
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    this.appendToTerminal(`Successfully staked ${amount} SOL!`, 'success');
-  }
-
-  displayRewards() {
-    // Mock rewards data
-    const rewardsText = 
-`Rewards Summary:
-Total Earned: 0.25 SOL
-Current APY: 7.5%
-Next Reward: 12 hours`;
-    this.appendToTerminal(rewardsText, 'success');
-  }
-
-  displayInsights() {
-    // Mock AI insights
-    const insights = [
-      "You're 2 weeks away from unlocking 10% bonus rewards!",
-      "Increasing your stake by 2 SOL would optimize your returns.",
-      "Market volatility is low - good time to increase stakes."
-    ];
-    this.appendToTerminal('AI Insights:\n' + insights.join('\n'), 'success');
-  }
-
-  clearTerminal() {
-    this.outputDiv.innerHTML = '';
-    this.displayWelcomeMessage();
-  }
-
-  appendToTerminal(message, type = 'default') {
-    const messageElement = document.createElement('div');
-    messageElement.className = `terminal-message ${type}`;
-    messageElement.textContent = message;
-    this.outputDiv.appendChild(messageElement);
+    let g = mergeGeometries([
+      new THREE.PlaneGeometry(1, 1, 250, 500),
+      new THREE.PlaneGeometry(1, 1, 250, 500)
+    ], true).rotateX(Math.PI * -0.5);
     
-    // Calculate if we should scroll based on visibility
-    const rect = messageElement.getBoundingClientRect();
-    const containerRect = this.outputDiv.getBoundingClientRect();
-    const shouldScroll = rect.bottom > containerRect.bottom;
-
-    if (shouldScroll) {
-      messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      // Ensure input is visible
-      setTimeout(() => {
-        this.outputDiv.scrollTop = this.outputDiv.scrollHeight;
-      }, 100);
-    }
+    let ms = Array.from({length: 2}, (_, idx) => {
+      let m = new THREE.MeshBasicMaterial({
+        color: idx < 0.5 ? 0x000000 : 0xffffff,
+        side: idx < 0.5 ? THREE.FrontSide : THREE.BackSide,
+        onBeforeCompile: shader => {
+          shader.uniforms.time = gu.time;
+          shader.uniforms.hasShift = {value: idx};
+          shader.vertexShader = `
+            uniform float hasShift;
+            uniform float time;
+            
+            varying float river;
+            varying float vHasShift;
+            
+            ${noise}
+            ${shader.vertexShader}
+          `.replace(
+            `#include <begin_vertex>`,
+            `#include <begin_vertex>
+            
+              vHasShift = hasShift;
+              
+              float t = time * PI;
+              
+              vec3 pos = vec3(modelMatrix * vec4(position, 1));
+              
+              float treeNoise = abs(snoise((pos.xz - vec2(0., t)) * 0.25));
+              treeNoise = pow(treeNoise, 0.5);
+              
+              float riverNoise = snoise(vec2(0, pos.z - t) * 0.05);
+              riverNoise = smoothstep(5., 7., abs(pos.x + riverNoise * 2.5));
+              
+              transformed.y += treeNoise * 2.5 * riverNoise;
+              transformed.y += hasShift * 0.05;
+              
+              river = riverNoise;
+            `
+          );
+          
+          shader.fragmentShader = `
+            varying float vHasShift;
+            varying float river;
+            
+            ${shader.fragmentShader}
+          `.replace(
+            `#include <color_fragment>`,
+            `#include <color_fragment>
+            
+            diffuseColor.rgb = vHasShift < 0.5 && river < 0.01 ? vec3(1) : diffuseColor.rgb;
+            `
+          );
+        }
+      });
+      return m;
+    });
+    
+    super(g, ms);
+    this.scale.set(50, 1, 50);
   }
 }
 
-// Initialize both UI and Terminal when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-  window.smartStash = new SmartStash();
-  window.terminal = new Terminal();
+class Sun extends THREE.Mesh {
+  constructor() {
+    let g = new THREE.PlaneGeometry(50, 50);
+    let m = new THREE.MeshBasicMaterial({
+      color: "red",
+      onBeforeCompile: shader => {
+        shader.uniforms.time = gu.time;
+        shader.fragmentShader = `
+          uniform float time;
+          ${shader.fragmentShader}
+        `.replace(
+          `#include <color_fragment>`,
+          `#include <color_fragment>
+            
+            vec2 lUv = (vUv - 0.5) * 2.;
+            float val = 0.;
+            float lenUv = length(lUv);
+            float tShift = fract(time * 0.5);
+            val = max(val, 1. - step(0.3, lenUv)); // central circle
+            val = max(val, step(0.3 + (tShift * 0.7), lenUv) - step(0.35 + (tShift * 0.65), lenUv)); // ripple
+            
+            val = 1. - min(val, step(0.025, lUv.y));
+            val = min(val, step(0.05, lUv.y));
+            
+            diffuseColor.rgb = vec3(val);
+          `
+        );
+      }
+    });
+    m.defines = {"USE_UV": ""};
+    super(g, m);
+    this.position.z = -25;
+  }
+}
+
+// Add color tracking functionality
+function updateTextColor() {
+  const heroText = document.querySelector('.hero h1');
+  if (!heroText) return;
+  
+  // Get the camera's position relative to the landscape
+  const cameraY = camera.position.y;
+  const landscapeY = landscape.position.y;
+  
+  // If camera is below the landscape, background appears white
+  if (cameraY < landscapeY + 2) {
+    heroText.style.color = '#000000';
+  } else {
+    heroText.style.color = '#ffffff';
+  }
+}
+
+let gu = {
+  time: {
+    value: 0
+  }
+};
+
+let dpr = Math.min(devicePixelRatio, 1);
+let scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+let camera = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.1, 1000);
+camera.position.set(0, 0.25, 1).setLength(30);
+
+let renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(devicePixelRatio);
+renderer.setSize(innerWidth * dpr, innerHeight * dpr);
+document.body.appendChild(renderer.domElement);
+
+window.addEventListener("resize", (event) => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth * dpr, innerHeight * dpr);
+});
+
+let controls = new OrbitControls(camera, renderer.domElement);
+controls.enabled = false;
+
+let light = new THREE.DirectionalLight(0xffffff, Math.PI);
+light.position.setScalar(1);
+scene.add(light, new THREE.AmbientLight(0xffffff, Math.PI * 0.5));
+
+let landscape = new Landscape();
+scene.add(landscape);
+let sun = new Sun();
+scene.add(sun);
+
+let clock = new THREE.Clock();
+let t = 0;
+
+renderer.setAnimationLoop(() => {
+  let dt = clock.getDelta();
+  t += dt;
+  gu.time.value = t;
+  controls.update();
+  renderer.render(scene, camera);
+  updateTextColor(); // Add color update to animation loop
 }); 
