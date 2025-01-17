@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { WalletContextProvider } from '../utils/wallet';
+import { WalletContextProvider } from './utils/wallet';
 import './globals.css';
 
 export default function RootLayout({
